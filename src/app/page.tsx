@@ -11,7 +11,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
 import styles from "./pag.module.css";
 
 ChartJS.register(
@@ -33,23 +32,31 @@ function getCurrentDate() {
 
 interface Weather {
   description: string;
+  icon: string;
 }
 
 interface Main {
   temp: number;
+  humidity: number;
+}
+
+interface Wind {
+  speed: number;
 }
 
 interface WeatherData {
   weather: Weather[];
   main: Main;
   dt: number;
+  wind: Wind;
 }
 
 export default function Home() {
   const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
   const [todayWeather, setTodayWeather] = useState<WeatherData | null>(null);
   const [inputCity, setInputCity] = useState(""); 
-  const [city, setCity] = useState("Chennai"); 
+  const [city, setCity] = useState("Chennai");
+  const [unit, setUnit] = useState<'C' | 'F'>('C');
 
   async function fetchDataApi(cityName: string) {
     try {
@@ -71,6 +78,15 @@ export default function Home() {
     fetchDataApi(storedCity);
   }, []);
 
+  const temperature = unit === 'C' 
+    ? (todayWeather?.main.temp - 273.15).toFixed(2) 
+    : ((todayWeather?.main.temp - 273.15) * 9/5 + 32).toFixed(2);
+
+  const humidity = todayWeather?.main.humidity; 
+  const windSpeed = todayWeather?.wind.speed; 
+  const weatherDescription = todayWeather?.weather[0].description.toLowerCase();
+  const weatherIcon = todayWeather?.weather[0].icon;
+
   const chartData = {
     labels: weatherData
       .slice(1)
@@ -84,7 +100,9 @@ export default function Home() {
         data: weatherData
           .slice(1)
           .filter((_, index) => index % 8 === 0)
-          .map((forecast) => (forecast.main.temp - 273.5).toFixed(2)),
+          .map((forecast) => unit === 'C' 
+            ? (forecast.main.temp - 273.15).toFixed(2) 
+            : ((forecast.main.temp - 273.15) * 9/5 + 32).toFixed(2)),
         fill: false,
         borderColor: "rgba(75,192,192,1)",
         tension: 0.1,
@@ -96,6 +114,10 @@ export default function Home() {
     e.preventDefault();
     setCity(inputCity); 
     fetchDataApi(inputCity); 
+  };
+
+  const handleUnitToggle = () => {
+    setUnit((prevUnit) => (prevUnit === 'C' ? 'F' : 'C'));
   };
 
   return (
@@ -116,25 +138,32 @@ export default function Home() {
           </button>
         </form>
 
+        <button 
+          className={`${styles.toggle_button} ${unit === 'C' ? styles.active : ''}`} 
+          onClick={handleUnitToggle}
+        >
+          Switch to °{unit === 'C' ? 'F' : 'C'}
+        </button>
+
         {todayWeather ? (
           <>
             <div className={styles.icon_and_weatherInfo}>
               <div className={styles.weatherIcon}>
-                {todayWeather.weather[0].description === "rain" ||
-                todayWeather.weather[0].description === "fog" ? (
-                  <i className={`wi wi-day-${todayWeather.weather[0].description}`}></i>
-                ) : (
-                  <i className="wi wi-day-cloudy"></i>
-                )}
+                <img 
+                  src={`https://openweathermap.org/img/wn/${weatherIcon}@2x.png`} 
+                  alt={weatherDescription} 
+                />
               </div>
               <div className={styles.weatherInfo}>
                 <div className={styles.temperature}>
-                  <span>
-                    {(todayWeather.main.temp - 273.5).toFixed(2) + String.fromCharCode(176)}
-                  </span>
+                  <span>{temperature + String.fromCharCode(176)}</span>
                 </div>
                 <div className={styles.weatherCondition}>
                   {todayWeather.weather[0].description.toUpperCase()}
+                </div>
+                <div className={styles.additionalInfo}>
+                  <div>Humidity: {humidity}%</div>
+                  <div>Wind Speed: {windSpeed} m/s</div>
                 </div>
               </div>
             </div>
@@ -158,14 +187,24 @@ export default function Home() {
                   day: 'numeric',
                 });
 
+                const forecastTemp = unit === 'C' 
+                  ? (forecast.main.temp - 273.15).toFixed(2) 
+                  : ((forecast.main.temp - 273.15) * 9/5 + 32).toFixed(2);
+
+                const forecastWeatherDescription = forecast.weather[0].description.toLowerCase();
+                const forecastWeatherIcon = forecast.weather[0].icon.replace("n", "d");
+
                 return (
                   <div key={index} className={styles.day}>
                     <div className={styles.weatherDate}>{forecastDate}</div>
                     <div className={styles.weatherIcon}>
-                      <i className="wi wi-day-cloudy"></i>
+                      <img 
+                        src={`https://openweathermap.org/img/wn/${forecastWeatherIcon}@2x.png`} 
+                        alt={forecastWeatherDescription} 
+                      />
                     </div>
                     <div className={styles.temperature}>
-                      {(forecast.main.temp - 273.5).toFixed(2) + String.fromCharCode(176)}
+                      {forecastTemp + String.fromCharCode(176)}
                     </div>
                     <div className={styles.weatherCondition}>
                       {forecast.weather[0].description?.toUpperCase()}
