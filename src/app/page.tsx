@@ -14,7 +14,6 @@ import {
 
 import styles from "./pag.module.css";
 
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -49,7 +48,8 @@ interface WeatherData {
 export default function Home() {
   const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
   const [todayWeather, setTodayWeather] = useState<WeatherData | null>(null);
-  const [city, setCity] = useState("");
+  const [inputCity, setInputCity] = useState(""); 
+  const [city, setCity] = useState("Chennai"); 
 
   async function fetchDataApi(cityName: string) {
     try {
@@ -71,7 +71,6 @@ export default function Home() {
     fetchDataApi(storedCity);
   }, []);
 
-  
   const chartData = {
     labels: weatherData
       .slice(1)
@@ -93,24 +92,24 @@ export default function Home() {
     ],
   };
 
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setCity(inputCity); 
+    fetchDataApi(inputCity); 
+  };
+
   return (
     <main className={styles.main}>
       <article className={styles.widget}>
-        <form
-          className={styles.weatherLocation}
-          onSubmit={(e) => {
-            e.preventDefault();
-            fetchDataApi(city);
-          }}
-        >
+        <form className={styles.weatherLocation} onSubmit={handleSearch}>
           <input
             className={styles.input_field}
             placeholder="Enter city name"
             type="text"
             id="city"
             name="city"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
+            value={inputCity}
+            onChange={(e) => setInputCity(e.target.value)} 
           />
           <button className={styles.search_button} type="submit">
             Search
