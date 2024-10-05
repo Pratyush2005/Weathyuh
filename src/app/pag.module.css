@@ -1,0 +1,168 @@
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.widget {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 20px; 
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.weatherLocation {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px; 
+}
+
+.input_field {
+  padding: 8px; 
+  border: 2px solid #4facfe;
+  border-radius: 8px;
+  outline: none;
+  flex: 1;
+  margin-right: 5px; 
+  transition: border 0.3s;
+}
+
+.input_field:focus {
+  border-color: #00f2fe;
+}
+
+.search_button {
+  padding: 8px 12px; 
+  border: none;
+  border-radius: 8px;
+  background-color: #4facfe;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search_button:hover {
+  background-color: #00f2fe;
+}
+
+
+.toggle_button {
+  padding: 8px 12px; 
+  border: none;
+  border-radius: 8px;
+  background-color: #4facfe;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  margin: 10px 0; 
+}
+
+.toggle_button:hover {
+  background-color: #00f2fe;
+  transform: scale(1.05);
+}
+
+.icon_and_weatherInfo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0; 
+}
+
+.weatherIcon {
+  font-size: 40px; 
+  margin-right: 10px; 
+}
+
+.weatherInfo {
+  text-align: left;
+}
+
+.temperature {
+  font-size: 24px; 
+  font-weight: bold;
+}
+
+.weatherCondition {
+  font-size: 14px; 
+  text-transform: uppercase;
+  color: #555;
+}
+
+.place {
+  font-size: 20px; 
+  font-weight: 600;
+}
+
+.date {
+  font-size: 12px; 
+  color: #777;
+  margin-bottom: 15px; 
+}
+
+.forecast {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.day {
+  flex-basis: calc(50% - 5px); 
+  background: #e0f7fa;
+  border-radius: 10px;
+  padding: 10px; 
+  margin: 5px 0; 
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.weatherIcon {
+  font-size: 30px; 
+}
+
+.weatherDate {
+  font-size: 14px; 
+  font-weight: bold;
+  margin-bottom: 5px; 
+  color: #333;
+}
+
+
+@media (max-width: 600px) {
+  .main {
+    padding: 10px; 
+  }
+
+  .widget {
+    padding: 15px; 
+    max-width: 100%; 
+  }
+
+  .input_field {
+    margin-right: 3px; 
+  }
+
+  .search_button,
+  .toggle_button {
+    padding: 6px 10px; 
+  }
+
+  .temperature {
+    font-size: 20px; 
+  }
+
+  .place {
+    font-size: 18px; 
+  }
+
+  .weatherCondition {
+    font-size: 12px; 
+  }
+}

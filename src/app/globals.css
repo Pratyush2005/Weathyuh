@@ -1,0 +1,83 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+
+@media (max-width: 768px) {
+  .day {
+    flex-basis: calc(50% - 10px); 
+  }
+
+  .widget {
+    padding: 15px; 
+    max-width: 100%; 
+  }
+
+  .weatherIcon {
+    font-size: 30px; 
+  }
+
+  .temperature {
+    font-size: 20px; 
+  }
+
+  .place {
+    font-size: 18px; 
+  }
+
+  .weatherCondition {
+    font-size: 12px; 
+  }
+
+  .input_field {
+    padding: 8px; 
+  }
+
+  .search_button, .toggle_button {
+    padding: 6px 10px; 
+  }
+
+  .date {
+    font-size: 12px; 
+  }
+
+  .forecast {
+    flex-direction: column; 
+  }
+
+  .day {
+    flex-basis: auto; 
+    margin: 5px 0; 
+  }
+}
+
+
+@media (max-width: 600px) {
+  .day {
+    flex-basis: 100%; 
+  }
+
+  .widget {
+    padding: 10px; 
+  }
+
+  .temperature {
+    font-size: 18px; 
+  }
+}
