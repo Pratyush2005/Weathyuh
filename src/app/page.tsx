@@ -53,8 +53,8 @@ interface WeatherData {
 export default function Home() {
   const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
   const [todayWeather, setTodayWeather] = useState<WeatherData | null>(null);
-  const [inputCity, setInputCity] = useState(""); 
-  const [city, setCity] = useState("Chennai");
+  const [inputCity, setInputCity] = useState<string>(""); 
+  const [city, setCity] = useState<string>("Chennai");
   const [unit, setUnit] = useState<'C' | 'F'>('C');
 
   async function fetchDataApi(cityName: string) {
@@ -72,7 +72,7 @@ export default function Home() {
       localStorage.setItem("lastSearchedCity", cityName);
     } catch (error) {
       console.error("Error fetching data:", error);
-      alert("Error fetching weather data. Please try again."); // User notification for errors
+      alert("Error fetching weather data. Please try again.");
     }
   }
 
@@ -82,31 +82,37 @@ export default function Home() {
     fetchDataApi(storedCity);
   }, []);
 
-  const temperature = unit === 'C' 
-    ? ((todayWeather?.main.temp ?? 0) - 273.15).toFixed(2) 
-    : (((todayWeather?.main.temp ?? 0) - 273.15) * 9/5 + 32).toFixed(2);
+  const temperature = todayWeather ? (unit === 'C' 
+    ? ((todayWeather.main.temp - 273.15).toFixed(2)) 
+    : (((todayWeather.main.temp - 273.15) * 9 / 5 + 32).toFixed(2))) 
+    : '0.00';
 
   const humidity = todayWeather?.main.humidity ?? 0; 
   const windSpeed = todayWeather?.wind.speed ?? 0; 
   const weatherDescription = todayWeather?.weather[0]?.description.toLowerCase() ?? '';
   const weatherIcon = todayWeather?.weather[0]?.icon ?? '';
 
+  const forecastData = weatherData
+    .filter((_, index) => index % 8 === 0)
+    .slice(1, 6);
+
+  const todayTemp = todayWeather ? (unit === 'C' 
+    ? (todayWeather.main.temp - 273.15).toFixed(2) 
+    : ((todayWeather.main.temp - 273.15) * 9 / 5 + 32).toFixed(2)) 
+    : '0.00';
+
   const chartData = {
-    labels: weatherData
-      .slice(1)
-      .filter((_, index) => index % 8 === 0)
-      .map((forecast) =>
-        new Date(forecast.dt * 1000).toLocaleDateString("en-US", { weekday: 'long' })
-      ), 
+    labels: ['Today', ...forecastData.map((forecast) =>
+      new Date(forecast.dt * 1000).toLocaleDateString("en-US", { weekday: 'long' })
+    )],
     datasets: [
       {
         label: "Temperature (°C)",
-        data: weatherData
-          .slice(1)
-          .filter((_, index) => index % 8 === 0)
-          .map((forecast) => unit === 'C' 
+        data: [parseFloat(todayTemp), ...forecastData.map((forecast) => 
+          unit === 'C' 
             ? (forecast.main.temp - 273.15).toFixed(2) 
-            : ((forecast.main.temp - 273.15) * 9/5 + 32).toFixed(2)),
+            : ((forecast.main.temp - 273.15) * 9 / 5 + 32).toFixed(2)
+        ).map(temp => parseFloat(temp))],
         fill: false,
         borderColor: "rgba(75,192,192,1)",
         tension: 0.1,
@@ -123,7 +129,7 @@ export default function Home() {
   };
 
   const handleUnitToggle = () => {
-    setUnit((prevUnit) => (prevUnit === 'C' ? 'F' : 'C'));
+    setUnit(prevUnit => (prevUnit === 'C' ? 'F' : 'C'));
   };
 
   return (
@@ -181,46 +187,44 @@ export default function Home() {
         )}
 
         <div className={styles.forecast}>
-          {weatherData
-            .slice(1) 
-            .filter((_, index) => index % 8 === 0) 
-            .slice(0, 6) 
-            .map((forecast, index) => {
-              const forecastDate = new Date(forecast.dt * 1000).toLocaleDateString("en-US", {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-              });
+          {forecastData.map((forecast, index) => {
+            if (!forecast || !forecast.main || !forecast.weather[0]) return null; 
 
-              const forecastTemp = unit === 'C' 
-                ? (forecast.main.temp - 273.15).toFixed(2) 
-                : ((forecast.main.temp - 273.15) * 9/5 + 32).toFixed(2);
+            const forecastDate = new Date(forecast.dt * 1000).toLocaleDateString("en-US", {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            });
 
-              const forecastWeatherDescription = forecast.weather[0].description?.toLowerCase() ?? '';
-              const forecastWeatherIcon = forecast.weather[0].icon.replace("n", "d");
+            const forecastTemp = unit === 'C' 
+              ? (forecast.main.temp - 273.15).toFixed(2) 
+              : ((forecast.main.temp - 273.15) * 9 / 5 + 32).toFixed(2);
 
-              return (
-                <div key={index} className={styles.day}>
-                  <div className={styles.weatherDate}>{forecastDate}</div>
-                  <div className={styles.weatherIcon}>
-                    <img 
-                      src={`https://openweathermap.org/img/wn/${forecastWeatherIcon}@2x.png`} 
-                      alt={forecastWeatherDescription} 
-                    />
-                  </div>
-                  <div className={styles.temperature}>
-                    {forecastTemp}°
-                  </div>
-                  <div className={styles.weatherCondition}>
-                    {forecast.weather[0].description?.toUpperCase()}
-                  </div>
+            const forecastWeatherDescription = forecast.weather[0].description?.toLowerCase() ?? '';
+            const forecastWeatherIcon = forecast.weather[0].icon.replace("n", "d");
+
+            return (
+              <div key={index} className={styles.day}>
+                <div className={styles.weatherDate}>{forecastDate}</div>
+                <div className={styles.weatherIcon}>
+                  <img 
+                    src={`https://openweathermap.org/img/wn/${forecastWeatherIcon}@2x.png`} 
+                    alt={forecastWeatherDescription} 
+                  />
                 </div>
-              );
-            })}
+                <div className={styles.temperature}>
+                  {forecastTemp}°
+                </div>
+                <div className={styles.weatherCondition}>
+                  {forecast.weather[0].description?.toUpperCase()}
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <div className={styles.chartContainer}>
-          <h2>5-Day Temperature Trend</h2>
+          <h2>5-Day Temperature Forecast</h2>
           <Line data={chartData} />
         </div>
       </article>
