@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from "react";
-import { Line } from 'react-chartjs-2';  // Import the Line component from react-chartjs-2
+import { Line } from 'react-chartjs-2'; 
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +14,7 @@ import {
 
 import styles from "./pag.module.css";
 
-// Register Chart.js modules
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -71,21 +71,21 @@ export default function Home() {
     fetchDataApi(storedCity);
   }, []);
 
-  // Prepare data for the weather trend graph
+  
   const chartData = {
     labels: weatherData
       .slice(1)
       .filter((_, index) => index % 8 === 0)
       .map((forecast) =>
         new Date(forecast.dt * 1000).toLocaleDateString("en-US", { weekday: 'long' })
-      ), // Extract days for the graph
+      ), 
     datasets: [
       {
         label: "Temperature (°C)",
         data: weatherData
           .slice(1)
           .filter((_, index) => index % 8 === 0)
-          .map((forecast) => (forecast.main.temp - 273.5).toFixed(2)), // Extract temperatures for the graph
+          .map((forecast) => (forecast.main.temp - 273.5).toFixed(2)),
         fill: false,
         borderColor: "rgba(75,192,192,1)",
         tension: 0.1,
@@ -176,7 +176,6 @@ export default function Home() {
               })}
         </div>
 
-        {/* Add the Weather Trend Graph */}
         <div className={styles.chartContainer}>
           <h2>5-Day Temperature Trend</h2>
           <Line data={chartData} />
